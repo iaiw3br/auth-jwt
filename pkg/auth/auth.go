@@ -3,8 +3,8 @@ package auth
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
-	"main/internal/auth"
 	"main/internal/service"
+	"main/internal/token"
 	"net/http"
 )
 
@@ -17,13 +17,13 @@ func Login(c *gin.Context) {
 	}
 
 	username := viper.GetString("USERNAME")
-	token, err := auth.CreateToken(username)
+	accessToken, err := token.CreateToken(username)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, err)
 		return
 	}
 
-	c.SetCookie("access_token", token, 1500, "/", "localhost", false, true)
+	c.SetCookie("access_token", accessToken, 1500, "/", "localhost", false, true)
 	c.JSON(http.StatusOK, "success login")
 }
 

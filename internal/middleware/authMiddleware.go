@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"main/internal/auth"
+	"main/internal/token"
 	"net/http"
 )
 
@@ -13,7 +13,7 @@ func TokenAuthMiddleware(c *gin.Context) {
 		c.Abort()
 	}
 
-	_, err = auth.ValidateToken(accessToken)
+	_, err = token.ValidateToken(accessToken)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, err.Error())
 		c.Abort()
