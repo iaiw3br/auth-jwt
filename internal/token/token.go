@@ -67,10 +67,10 @@ func ValidateToken(tokenString, key string) (*jwt.Token, error) {
 		} else if ve.Errors&(jwt.ValidationErrorExpired|jwt.ValidationErrorNotValidYet) != 0 {
 			return nil, errors.New(authError.ErrTokenIsExpired)
 		} else {
-			return nil, errors.New(authError.ErrorInvalidToken)
+			return nil, errors.New(authError.ErrInvalidToken)
 		}
 	} else {
-		return nil, errors.New(authError.ErrorInvalidToken)
+		return nil, errors.New(authError.ErrInvalidToken)
 	}
 }
 
