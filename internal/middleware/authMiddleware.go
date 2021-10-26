@@ -29,7 +29,7 @@ func TokenAuthMiddleware(c *gin.Context) {
 	username, err := token.GetUsernameFromToken(refreshToken, "SECRET_REFRESH")
 
 	if err != nil || username == "" {
-		c.JSON(http.StatusUnauthorized, authError.ErrorInvalidToken)
+		c.JSON(http.StatusUnauthorized, authError.ErrInvalidToken)
 		c.Abort()
 	}
 

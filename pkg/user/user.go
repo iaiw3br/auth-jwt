@@ -14,7 +14,7 @@ func GetUserInformation(c *gin.Context) {
 		if ok {
 			tokens, err := token.CreateTokens(usernameString)
 			if err != nil {
-				c.JSON(http.StatusUnauthorized, authError.ErrorInvalidToken)
+				c.JSON(http.StatusUnauthorized, authError.ErrInvalidToken)
 			}
 			c.SetCookie("access_token", tokens["accessToken"], 60, "/", "localhost", false, true)
 			c.SetCookie("refresh_token", tokens["refreshToken"], 3600, "/", "localhost", false, true)

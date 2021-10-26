@@ -12,14 +12,14 @@ func CheckValidateUser(c *gin.Context) error {
 	var user model.User
 
 	if err := c.ShouldBindJSON(&user); err != nil {
-		return errors.New(authError.ErrorInvalidJson)
+		return errors.New(authError.ErrInvalidJson)
 	}
 
 	username := viper.GetString("USERNAME")
 	password := viper.GetString("PASSWORD")
 
 	if username != user.Username || password != user.Password {
-		return errors.New(authError.ErrorInvalidLoginData)
+		return errors.New(authError.ErrInvalidLoginData)
 	}
 
 	return nil
