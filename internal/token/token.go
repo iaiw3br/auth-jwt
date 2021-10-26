@@ -8,15 +8,32 @@ import (
 	"time"
 )
 
-func CreateToken(username string) (string, error) {
+func CreateTokens(username string) (map[string]string, error) {
+	tokens := make(map[string]string)
+
+	accessToken, err := createToken(username, "SECRET_ACCESS", time.Minute)
+	if err != nil {
+		return nil, err
+	}
+
+	refreshToken, err := createToken(username, "SECRET_REFRESH", time.Hour)
+	if err != nil {
+		return nil, err
+	}
+
+	tokens["accessToken"] = accessToken
+	tokens["refreshToken"] = refreshToken
+
+	return tokens, nil
+}
+
+func createToken(username, secretKey string, exp time.Duration) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"Username": username,
-		"exp":      time.Now().Add(time.Second).Unix(),
+		"exp":      time.Now().Add(exp).Unix(),
 	})
 
-	accessSecret := viper.GetString("SECRET_ACCESS")
-
-	tokenString, err := token.SignedString([]byte(accessSecret))
+	tokenString, err := token.SignedString([]byte(viper.GetString(secretKey)))
 	if err != nil {
 		return "", err
 	}
@@ -24,9 +41,9 @@ func CreateToken(username string) (string, error) {
 	return tokenString, nil
 }
 
-func parseToken(tokenString string) (*jwt.Token, error) {
+func parseToken(tokenString, key string) (*jwt.Token, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return []byte(viper.GetString("SECRET_ACCESS")), nil
+		return []byte(viper.GetString(key)), nil
 	})
 
 	if err != nil {
@@ -36,8 +53,8 @@ func parseToken(tokenString string) (*jwt.Token, error) {
 	return token, nil
 }
 
-func ValidateToken(tokenString string) (*jwt.Token, error) {
-	token, err := parseToken(tokenString)
+func ValidateToken(tokenString, key string) (*jwt.Token, error) {
+	token, err := parseToken(tokenString, key)
 	if err != nil {
 		return nil, err
 	}
@@ -55,4 +72,31 @@ func ValidateToken(tokenString string) (*jwt.Token, error) {
 	} else {
 		return nil, errors.New(authError.ErrorInvalidToken)
 	}
+}
+
+func CheckUpdateTokens(accessToken, refreshToken string) bool {
+	_, accessTokenError := ValidateToken(accessToken, "SECRET_ACCESS")
+	_, refreshTokenError := ValidateToken(refreshToken, "SECRET_REFRESH")
+
+	if refreshTokenError == nil && (accessTokenError != nil || accessToken == "") {
+		return true
+	}
+
+	return false
+}
+
+func GetUsernameFromToken(tokenString, key string) (string, error) {
+	token, err := ValidateToken(tokenString, key)
+	if err != nil {
+		return "", err
+	}
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if ok && token.Valid {
+		username, ok := claims["Username"].(string)
+		if !ok {
+			return "", err
+		}
+		return username, nil
+	}
+	return "", nil
 }
