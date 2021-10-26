@@ -7,4 +7,5 @@ var (
 	ErrFailedStartServer  = "failed with start server"
 	ErrNotEvenAToken      = "that's not even a token"
 	ErrTokenIsExpired     = "token is expired"
+	ErrIncomingData       = "invalid incoming data"
 )
