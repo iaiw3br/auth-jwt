@@ -18,11 +18,10 @@ func GetUserInformation(c *gin.Context) {
 			}
 			c.SetCookie("access_token", tokens["accessToken"], 60, "/", "localhost", false, true)
 			c.SetCookie("refresh_token", tokens["refreshToken"], 3600, "/", "localhost", false, true)
-
-			c.JSON(http.StatusOK, "tokens are success refreshed")
-			return
 		}
-		c.JSON(http.StatusOK, username)
+		c.JSON(http.StatusOK, gin.H{
+			"message": username,
+		})
 		return
 	}
 

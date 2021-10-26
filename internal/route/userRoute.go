@@ -3,7 +3,7 @@ package route
 import (
 	"github.com/gin-gonic/gin"
 	"main/internal/middleware"
-	"main/internal/user"
+	"main/pkg/user"
 )
 
 func UserRoute(router *gin.Engine) *gin.Engine {
